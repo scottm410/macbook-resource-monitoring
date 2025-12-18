@@ -116,12 +116,12 @@ if [[ "$TEST_SUITE" == "all" || "$TEST_SUITE" == "integration" ]]; then
         run_test "mactop is installed" "command -v mactop"
         
         # Test: mactop can run headless mode
-        run_test "mactop headless mode works" "timeout 5 mactop --headless --count 1 2>/dev/null | head -1 | jq -e '.[0].timestamp' > /dev/null"
+        run_test "mactop headless mode works" "mactop --headless --count 1 2>/dev/null | jq -e '.[0].timestamp' > /dev/null"
         
         # Test: mactop output has expected fields
-        run_test "mactop output has cpu_usage" "timeout 5 mactop --headless --count 1 2>/dev/null | head -1 | jq -e '.[0].cpu_usage' > /dev/null"
-        run_test "mactop output has memory" "timeout 5 mactop --headless --count 1 2>/dev/null | head -1 | jq -e '.[0].memory' > /dev/null"
-        run_test "mactop output has soc_metrics" "timeout 5 mactop --headless --count 1 2>/dev/null | head -1 | jq -e '.[0].soc_metrics' > /dev/null"
+        run_test "mactop output has cpu_usage" "mactop --headless --count 1 2>/dev/null | jq -e '.[0].cpu_usage' > /dev/null"
+        run_test "mactop output has memory" "mactop --headless --count 1 2>/dev/null | jq -e '.[0].memory' > /dev/null"
+        run_test "mactop output has soc_metrics" "mactop --headless --count 1 2>/dev/null | jq -e '.[0].soc_metrics' > /dev/null"
     else
         skip_test "mactop is installed" "mactop not found - install with: brew install mactop"
         skip_test "mactop headless mode works" "mactop not installed"
