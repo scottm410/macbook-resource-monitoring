@@ -667,33 +667,31 @@ class ResourceMonitor {
 
         // Update CPU indicator
         const cpuIndicator = document.getElementById('cpu-status-indicator');
+        const cpuAvgValue = document.getElementById('cpu-avg-value');
         if (cpuIndicator) {
             cpuIndicator.classList.remove('status-ok', 'status-warning', 'status-high');
+            if (cpuAvgValue) cpuAvgValue.textContent = `${avgCpu.toFixed(0)}%`;
             if (avgCpu >= CPU_HIGH_THRESHOLD) {
                 cpuIndicator.classList.add('status-high');
-                cpuIndicator.title = `CPU High: ${avgCpu.toFixed(1)}% (30s avg)`;
             } else if (avgCpu >= CPU_WARNING_THRESHOLD) {
                 cpuIndicator.classList.add('status-warning');
-                cpuIndicator.title = `CPU Warning: ${avgCpu.toFixed(1)}% (30s avg)`;
             } else {
                 cpuIndicator.classList.add('status-ok');
-                cpuIndicator.title = `CPU OK: ${avgCpu.toFixed(1)}% (30s avg)`;
             }
         }
 
         // Update Memory indicator
         const memIndicator = document.getElementById('mem-status-indicator');
+        const memAvgValue = document.getElementById('mem-avg-value');
         if (memIndicator) {
             memIndicator.classList.remove('status-ok', 'status-warning', 'status-high');
+            if (memAvgValue) memAvgValue.textContent = `${avgMem.toFixed(0)}%`;
             if (avgMem >= MEM_HIGH_THRESHOLD) {
                 memIndicator.classList.add('status-high');
-                memIndicator.title = `Memory High: ${avgMem.toFixed(1)}% (30s avg)`;
             } else if (avgMem >= MEM_WARNING_THRESHOLD) {
                 memIndicator.classList.add('status-warning');
-                memIndicator.title = `Memory Warning: ${avgMem.toFixed(1)}% (30s avg)`;
             } else {
                 memIndicator.classList.add('status-ok');
-                memIndicator.title = `Memory OK: ${avgMem.toFixed(1)}% (30s avg)`;
             }
         }
     }

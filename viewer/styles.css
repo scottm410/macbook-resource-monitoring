@@ -446,6 +446,11 @@ header h1 {
     letter-spacing: 0.5px;
 }
 
+.status-indicator .indicator-value {
+    font-weight: 700;
+    margin-left: 2px;
+}
+
 /* Normal state - green */
 .status-indicator.status-ok {
     background: rgba(74, 222, 128, 0.15);
