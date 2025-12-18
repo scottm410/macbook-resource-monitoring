@@ -650,16 +650,52 @@ class ResourceMonitor {
         const tbody = document.getElementById('process-tbody');
         const highlightWindsurf = document.getElementById('highlight-windsurf').checked;
         
-        // mactop doesn't include process list in headless mode by default
-        // We'll show a placeholder or parse from the data if available
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="4" style="text-align: center; color: var(--text-secondary);">
-                    Process list available in interactive mactop mode.<br>
-                    Run <code>mactop</code> in terminal for live process view.
-                </td>
-            </tr>
-        `;
+        // Use Windsurf process data from our sampler
+        if (!latest?.windsurf?.processes || latest.windsurf.processes.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-secondary);">
+                        No Windsurf processes detected.<br>
+                        Make sure Windsurf is running.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Sort by CPU usage descending, take top 15
+        const processes = [...latest.windsurf.processes]
+            .sort((a, b) => (b.cpu || 0) - (a.cpu || 0))
+            .slice(0, 15);
+
+        tbody.innerHTML = processes.map(proc => {
+            const typeLabels = {
+                'cascade_ai': '🤖 Cascade AI',
+                'renderer': '🖼️ Renderer',
+                'extension_host': '🔌 Extension',
+                'gpu_helper': '🎮 GPU Helper',
+                'language_server': '📝 Lang Server',
+                'main': '⚡ Main',
+                'other': '📦 Other'
+            };
+            
+            const typeLabel = typeLabels[proc.type] || proc.type;
+            const isHighCpu = proc.cpu > 50;
+            const isHighMem = proc.rss_mb > 500;
+            
+            const rowClass = highlightWindsurf ? 'highlighted' : '';
+            const cpuClass = isHighCpu ? 'style="color: var(--accent-red); font-weight: bold;"' : '';
+            const memClass = isHighMem ? 'style="color: var(--accent-yellow); font-weight: bold;"' : '';
+            
+            return `
+                <tr class="${rowClass}">
+                    <td>${proc.pid}</td>
+                    <td>${typeLabel}</td>
+                    <td ${cpuClass}>${(proc.cpu || 0).toFixed(1)}%</td>
+                    <td ${memClass}>${(proc.rss_mb || 0).toFixed(0)} MB</td>
+                </tr>
+            `;
+        }).join('');
     }
 
     updateStatistics() {

@@ -79,6 +79,11 @@ if [[ "$TEST_SUITE" == "all" || "$TEST_SUITE" == "unit" ]]; then
     run_test "Cleanup script exists" "[ -f '$PROJECT_DIR/src/cleanup.sh' ]"
     run_test "Cleanup script is valid bash" "bash -n '$PROJECT_DIR/src/cleanup.sh'"
     
+    # Test: Sampler script exists and is valid
+    run_test "Sampler script exists" "[ -f '$PROJECT_DIR/src/sampler.sh' ]"
+    run_test "Sampler script is valid bash" "bash -n '$PROJECT_DIR/src/sampler.sh'"
+    run_test "Sampler script is executable" "[ -x '$PROJECT_DIR/src/sampler.sh' ]"
+    
     # Test: Viewer files exist
     run_test "Viewer HTML exists" "[ -f '$PROJECT_DIR/viewer/index.html' ]"
     run_test "Viewer CSS exists" "[ -f '$PROJECT_DIR/viewer/styles.css' ]"
@@ -135,6 +140,12 @@ if [[ "$TEST_SUITE" == "all" || "$TEST_SUITE" == "integration" ]]; then
     
     # Test: bc is installed (required for interval calculation)
     run_test "bc is installed" "command -v bc"
+    
+    # Test: python3 is installed (required for sampler timing)
+    run_test "python3 is installed" "command -v python3"
+    
+    # Test: Sampler can collect Windsurf data
+    run_test "Sampler collects Windsurf processes" "ps aux | grep -i windsurf | grep -v grep | wc -l | grep -q '[1-9]'"
     
     # Test: Monitor help command works
     run_test "monitor.sh help works" "'$PROJECT_DIR/src/monitor.sh' help 2>&1 | grep -q 'Usage'"
@@ -195,11 +206,38 @@ if [[ "$TEST_SUITE" == "all" || "$TEST_SUITE" == "e2e" ]]; then
                 ((PASSED++))
                 
                 # Validate JSON format
-                if head -1 "$log_file" | jq -e '.timestamp' > /dev/null 2>&1; then
+                if tail -1 "$log_file" | jq -e '.timestamp' > /dev/null 2>&1; then
                     echo -e "    Log entries are valid JSON:                      ${GREEN}PASS${NC}"
                     ((PASSED++))
                 else
                     echo -e "    Log entries are valid JSON:                      ${RED}FAIL${NC}"
+                    ((FAILED++))
+                fi
+                
+                # Test: Windsurf data is present in logs
+                if tail -1 "$log_file" | jq -e '.windsurf.process_count' > /dev/null 2>&1; then
+                    echo -e "    Windsurf data in logs:                           ${GREEN}PASS${NC}"
+                    ((PASSED++))
+                else
+                    echo -e "    Windsurf data in logs:                           ${RED}FAIL${NC}"
+                    ((FAILED++))
+                fi
+                
+                # Test: Sampling overhead is tracked
+                if tail -1 "$log_file" | jq -e '.sampling_overhead_ms' > /dev/null 2>&1; then
+                    echo -e "    Sampling overhead tracked:                       ${GREEN}PASS${NC}"
+                    ((PASSED++))
+                else
+                    echo -e "    Sampling overhead tracked:                       ${RED}FAIL${NC}"
+                    ((FAILED++))
+                fi
+                
+                # Test: CPU normalization is present
+                if tail -1 "$log_file" | jq -e '.cpu_usage_normalized' > /dev/null 2>&1; then
+                    echo -e "    CPU normalization present:                       ${GREEN}PASS${NC}"
+                    ((PASSED++))
+                else
+                    echo -e "    CPU normalization present:                       ${RED}FAIL${NC}"
                     ((FAILED++))
                 fi
             else
