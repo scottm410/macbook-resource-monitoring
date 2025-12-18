@@ -89,6 +89,21 @@ if [[ "$TEST_SUITE" == "all" || "$TEST_SUITE" == "unit" ]]; then
     run_test "Viewer CSS exists" "[ -f '$PROJECT_DIR/viewer/styles.css' ]"
     run_test "Viewer JS exists" "[ -f '$PROJECT_DIR/viewer/app.js' ]"
     
+    # Test: Status indicators in HTML
+    run_test "CPU status indicator in HTML" "grep -q 'cpu-status-indicator' '$PROJECT_DIR/viewer/index.html'"
+    run_test "Memory status indicator in HTML" "grep -q 'mem-status-indicator' '$PROJECT_DIR/viewer/index.html'"
+    
+    # Test: Status indicator CSS classes exist
+    run_test "Status indicator CSS exists" "grep -q 'status-indicator' '$PROJECT_DIR/viewer/styles.css'"
+    run_test "Status OK CSS exists" "grep -q 'status-ok' '$PROJECT_DIR/viewer/styles.css'"
+    run_test "Status warning CSS exists" "grep -q 'status-warning' '$PROJECT_DIR/viewer/styles.css'"
+    run_test "Status high CSS exists" "grep -q 'status-high' '$PROJECT_DIR/viewer/styles.css'"
+    
+    # Test: Threshold logic in JS
+    run_test "CPU threshold in JS" "grep -q 'CPU_HIGH_THRESHOLD' '$PROJECT_DIR/viewer/app.js'"
+    run_test "Memory threshold in JS" "grep -q 'MEM_HIGH_THRESHOLD' '$PROJECT_DIR/viewer/app.js'"
+    run_test "30-second rolling average in JS" "grep -q 'thirtySecondsAgo' '$PROJECT_DIR/viewer/app.js'"
+    
     # Test: Launcher files exist
     run_test "StartMonitoring.command exists" "[ -f '$PROJECT_DIR/launchers/StartMonitoring.command' ]"
     run_test "StopMonitoring.command exists" "[ -f '$PROJECT_DIR/launchers/StopMonitoring.command' ]"

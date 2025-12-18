@@ -60,6 +60,19 @@
                         <span class="label">Overhead</span>
                         <span id="sampling-overhead" class="value">-- ms</span>
                     </div>
+                    <div class="ws-stat-item">
+                        <span class="label">30s Avg</span>
+                        <div class="status-indicators">
+                            <div id="cpu-status-indicator" class="status-indicator" title="CPU (30s avg)">
+                                <span class="indicator-icon">⚡</span>
+                                <span class="indicator-label">CPU</span>
+                            </div>
+                            <div id="mem-status-indicator" class="status-indicator" title="Memory (30s avg)">
+                                <span class="indicator-icon">💾</span>
+                                <span class="indicator-label">MEM</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="ws-stat-item full-width">
                         <span class="bar-label">CPU (norm):</span>
                         <div class="bar-wrapper">
@@ -75,7 +88,6 @@
                         </div>
                     </div>
                 </div>
-                <div id="ws-warnings" class="warnings"></div>
             </div>
 
             <!-- Row 2: Memory, CPU, GPU -->

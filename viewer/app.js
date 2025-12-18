@@ -631,19 +631,71 @@ class ResourceMonitor {
         document.getElementById('ws-mem-bar').style.width = `${Math.min(memPct, 100)}%`;
         document.getElementById('ws-mem-value').textContent = `${memPct.toFixed(1)}%`;
 
-        // Update warnings
-        const warnings = [];
-        if (cpuNorm > 50) {
-            warnings.push('<span class="warning-badge high-cpu">⚠️ High CPU: ' + cpuNorm.toFixed(0) + '%</span>');
-        }
-        if (memPct > 50) {
-            warnings.push('<span class="warning-badge high-mem">⚠️ High Memory: ' + memPct.toFixed(0) + '%</span>');
-        }
-        if ((ws.total_rss_mb || 0) > 8000) {
-            warnings.push('<span class="warning-badge high-mem">⚠️ RAM > 8GB</span>');
+        // Update 30-second rolling average status indicators
+        this.updateStatusIndicators();
+    }
+
+    updateStatusIndicators() {
+        // Get last 30 seconds of data (assuming ~1 sample per second with overhead)
+        const now = Date.now();
+        const thirtySecondsAgo = now - 30000;
+        
+        const recentData = this.data.filter(d => {
+            const ts = new Date(d.timestamp).getTime();
+            return ts >= thirtySecondsAgo && d.windsurf;
+        });
+
+        if (recentData.length === 0) return;
+
+        // Calculate 30-second averages
+        let totalCpu = 0;
+        let totalMem = 0;
+        
+        for (const d of recentData) {
+            totalCpu += d.windsurf?.total_cpu_normalized || 0;
+            totalMem += d.windsurf?.total_mem || 0;
         }
         
-        document.getElementById('ws-warnings').innerHTML = warnings.join('');
+        const avgCpu = totalCpu / recentData.length;
+        const avgMem = totalMem / recentData.length;
+
+        // Configurable thresholds
+        const CPU_WARNING_THRESHOLD = 30;
+        const CPU_HIGH_THRESHOLD = 50;
+        const MEM_WARNING_THRESHOLD = 40;
+        const MEM_HIGH_THRESHOLD = 60;
+
+        // Update CPU indicator
+        const cpuIndicator = document.getElementById('cpu-status-indicator');
+        if (cpuIndicator) {
+            cpuIndicator.classList.remove('status-ok', 'status-warning', 'status-high');
+            if (avgCpu >= CPU_HIGH_THRESHOLD) {
+                cpuIndicator.classList.add('status-high');
+                cpuIndicator.title = `CPU High: ${avgCpu.toFixed(1)}% (30s avg)`;
+            } else if (avgCpu >= CPU_WARNING_THRESHOLD) {
+                cpuIndicator.classList.add('status-warning');
+                cpuIndicator.title = `CPU Warning: ${avgCpu.toFixed(1)}% (30s avg)`;
+            } else {
+                cpuIndicator.classList.add('status-ok');
+                cpuIndicator.title = `CPU OK: ${avgCpu.toFixed(1)}% (30s avg)`;
+            }
+        }
+
+        // Update Memory indicator
+        const memIndicator = document.getElementById('mem-status-indicator');
+        if (memIndicator) {
+            memIndicator.classList.remove('status-ok', 'status-warning', 'status-high');
+            if (avgMem >= MEM_HIGH_THRESHOLD) {
+                memIndicator.classList.add('status-high');
+                memIndicator.title = `Memory High: ${avgMem.toFixed(1)}% (30s avg)`;
+            } else if (avgMem >= MEM_WARNING_THRESHOLD) {
+                memIndicator.classList.add('status-warning');
+                memIndicator.title = `Memory Warning: ${avgMem.toFixed(1)}% (30s avg)`;
+            } else {
+                memIndicator.classList.add('status-ok');
+                memIndicator.title = `Memory OK: ${avgMem.toFixed(1)}% (30s avg)`;
+            }
+        }
     }
 
     updateProcessTable(latest) {

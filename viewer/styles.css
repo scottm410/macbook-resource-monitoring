@@ -417,6 +417,56 @@ header h1 {
     color: var(--accent-purple);
 }
 
+/* Status Indicators (30s rolling average) */
+.status-indicators {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.status-indicator .indicator-icon {
+    font-size: 0.8rem;
+}
+
+.status-indicator .indicator-label {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Normal state - green */
+.status-indicator.status-ok {
+    background: rgba(74, 222, 128, 0.15);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+/* Warning state - yellow */
+.status-indicator.status-warning {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: var(--accent-yellow);
+    color: var(--accent-yellow);
+}
+
+/* High state - red */
+.status-indicator.status-high {
+    background: rgba(248, 113, 113, 0.2);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+}
+
 /* Legacy windsurf-card support */
 .windsurf-card {
     border: 1px solid var(--accent-purple);
