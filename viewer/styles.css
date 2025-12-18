@@ -368,3 +368,121 @@ header h1 {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-blue);
 }
+
+/* Windsurf Panel */
+.windsurf-card {
+    border: 1px solid var(--accent-purple);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(167, 139, 250, 0.05) 100%);
+}
+
+.windsurf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.windsurf-summary {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.windsurf-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.windsurf-stat .label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.windsurf-stat .value {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--accent-purple);
+}
+
+.warnings {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.warning-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    animation: pulse-warning 2s infinite;
+}
+
+.warning-badge.high-cpu {
+    background: rgba(248, 113, 113, 0.2);
+    color: var(--accent-red);
+    border: 1px solid var(--accent-red);
+}
+
+.warning-badge.high-mem {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--accent-yellow);
+    border: 1px solid var(--accent-yellow);
+}
+
+@keyframes pulse-warning {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.windsurf-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.bar-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.bar-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    min-width: 130px;
+}
+
+.bar-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bar {
+    height: 20px;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    min-width: 4px;
+}
+
+.bar.cpu-bar {
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+}
+
+.bar.mem-bar {
+    background: linear-gradient(90deg, var(--accent-green), var(--accent-yellow));
+}
+
+.bar-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 50px;
+}

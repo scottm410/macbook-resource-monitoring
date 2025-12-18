@@ -108,6 +108,45 @@
                 <h3>System Power Over Time</h3>
                 <canvas id="power-chart"></canvas>
             </div>
+
+            <!-- Windsurf Usage Panel -->
+            <div class="metric-card wide windsurf-card">
+                <h3>🌊 Windsurf Usage</h3>
+                <div class="windsurf-header">
+                    <div class="windsurf-summary">
+                        <div class="windsurf-stat">
+                            <span class="label">Processes:</span>
+                            <span id="ws-process-count" class="value">--</span>
+                        </div>
+                        <div class="windsurf-stat">
+                            <span class="label">Total RAM:</span>
+                            <span id="ws-total-rss" class="value">-- GB</span>
+                        </div>
+                        <div class="windsurf-stat">
+                            <span class="label">Sampling Overhead:</span>
+                            <span id="sampling-overhead" class="value">-- ms</span>
+                        </div>
+                    </div>
+                    <div id="ws-warnings" class="warnings"></div>
+                </div>
+                <div class="windsurf-bars">
+                    <div class="bar-container">
+                        <span class="bar-label">CPU (normalized):</span>
+                        <div class="bar-wrapper">
+                            <div id="ws-cpu-bar" class="bar cpu-bar"></div>
+                            <span id="ws-cpu-value" class="bar-value">--%</span>
+                        </div>
+                    </div>
+                    <div class="bar-container">
+                        <span class="bar-label">Memory:</span>
+                        <div class="bar-wrapper">
+                            <div id="ws-mem-bar" class="bar mem-bar"></div>
+                            <span id="ws-mem-value" class="bar-value">--%</span>
+                        </div>
+                    </div>
+                </div>
+                <canvas id="windsurf-chart"></canvas>
+            </div>
         </div>
 
         <div class="process-section">

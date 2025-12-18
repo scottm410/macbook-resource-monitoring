@@ -34,7 +34,8 @@ class ResourceMonitor {
     }
 
     setupCharts() {
-        const chartConfig = {
+        // Base config for small charts (no time axis)
+        const chartConfigSmall = {
             type: 'line',
             options: {
                 responsive: true,
@@ -61,6 +62,51 @@ class ResourceMonitor {
                 }
             }
         };
+
+        // Config for wide charts with time axis
+        const chartConfigWide = {
+            type: 'line',
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 0 },
+                plugins: {
+                    legend: { 
+                        display: true,
+                        labels: { color: '#a0a0a0', boxWidth: 12 }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: { 
+                            unit: 'minute',
+                            displayFormats: {
+                                minute: 'HH:mm',
+                                hour: 'HH:mm'
+                            }
+                        },
+                        display: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { 
+                            color: '#a0a0a0',
+                            maxTicksLimit: 10
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: '#a0a0a0' }
+                    }
+                },
+                elements: {
+                    point: { radius: 0 },
+                    line: { tension: 0.3 }
+                }
+            }
+        };
+
+        const chartConfig = chartConfigSmall;
 
         // CPU Chart
         this.charts.cpu = new Chart(document.getElementById('cpu-chart'), {
@@ -208,9 +254,9 @@ class ResourceMonitor {
             }
         });
 
-        // Power Chart
+        // Power Chart - with time axis
         this.charts.power = new Chart(document.getElementById('power-chart'), {
-            ...chartConfig,
+            ...chartConfigWide,
             data: {
                 datasets: [
                     {
@@ -233,13 +279,68 @@ class ResourceMonitor {
                         backgroundColor: 'transparent'
                     }
                 ]
+            }
+        });
+
+        // Windsurf Chart - with time axis
+        this.charts.windsurf = new Chart(document.getElementById('windsurf-chart'), {
+            ...chartConfigWide,
+            data: {
+                datasets: [
+                    {
+                        label: 'CPU % (normalized)',
+                        data: [],
+                        borderColor: '#a78bfa',
+                        backgroundColor: 'rgba(167, 139, 250, 0.1)',
+                        fill: true,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Memory %',
+                        data: [],
+                        borderColor: '#4ade80',
+                        backgroundColor: 'transparent',
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'RAM (GB)',
+                        data: [],
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'transparent',
+                        yAxisID: 'y1'
+                    }
+                ]
             },
             options: {
-                ...chartConfig.options,
-                plugins: {
-                    legend: { 
+                ...chartConfigWide.options,
+                scales: {
+                    ...chartConfigWide.options.scales,
+                    y: {
+                        type: 'linear',
                         display: true,
-                        labels: { color: '#a0a0a0', boxWidth: 12 }
+                        position: 'left',
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: '#a0a0a0' },
+                        title: {
+                            display: true,
+                            text: '%',
+                            color: '#a0a0a0'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#fbbf24' },
+                        title: {
+                            display: true,
+                            text: 'GB',
+                            color: '#fbbf24'
+                        }
                     }
                 }
             }
@@ -485,6 +586,64 @@ class ResourceMonitor {
             y: d.soc_metrics?.gpu_power || 0
         }));
         this.charts.power.update('none');
+
+        // Windsurf Chart
+        if (this.charts.windsurf) {
+            this.charts.windsurf.data.datasets[0].data = recentData.map((d, i) => ({
+                x: timestamps[i],
+                y: d.windsurf?.total_cpu_normalized || 0
+            }));
+            this.charts.windsurf.data.datasets[1].data = recentData.map((d, i) => ({
+                x: timestamps[i],
+                y: d.windsurf?.total_mem || 0
+            }));
+            this.charts.windsurf.data.datasets[2].data = recentData.map((d, i) => ({
+                x: timestamps[i],
+                y: (d.windsurf?.total_rss_mb || 0) / 1024
+            }));
+            this.charts.windsurf.update('none');
+        }
+
+        // Update Windsurf panel
+        this.updateWindsurfPanel(recentData[recentData.length - 1]);
+    }
+
+    updateWindsurfPanel(latest) {
+        if (!latest?.windsurf) {
+            // No windsurf data yet
+            return;
+        }
+
+        const ws = latest.windsurf;
+        
+        // Update summary stats
+        document.getElementById('ws-process-count').textContent = ws.process_count || 0;
+        document.getElementById('ws-total-rss').textContent = `${((ws.total_rss_mb || 0) / 1024).toFixed(2)} GB`;
+        document.getElementById('sampling-overhead').textContent = `${latest.sampling_overhead_ms || 0} ms`;
+
+        // Update bars
+        const cpuNorm = ws.total_cpu_normalized || 0;
+        const memPct = ws.total_mem || 0;
+        
+        document.getElementById('ws-cpu-bar').style.width = `${Math.min(cpuNorm, 100)}%`;
+        document.getElementById('ws-cpu-value').textContent = `${cpuNorm.toFixed(1)}%`;
+        
+        document.getElementById('ws-mem-bar').style.width = `${Math.min(memPct, 100)}%`;
+        document.getElementById('ws-mem-value').textContent = `${memPct.toFixed(1)}%`;
+
+        // Update warnings
+        const warnings = [];
+        if (cpuNorm > 50) {
+            warnings.push('<span class="warning-badge high-cpu">⚠️ High CPU: ' + cpuNorm.toFixed(0) + '%</span>');
+        }
+        if (memPct > 50) {
+            warnings.push('<span class="warning-badge high-mem">⚠️ High Memory: ' + memPct.toFixed(0) + '%</span>');
+        }
+        if ((ws.total_rss_mb || 0) > 8000) {
+            warnings.push('<span class="warning-badge high-mem">⚠️ RAM > 8GB</span>');
+        }
+        
+        document.getElementById('ws-warnings').innerHTML = warnings.join('');
     }
 
     updateProcessTable(latest) {

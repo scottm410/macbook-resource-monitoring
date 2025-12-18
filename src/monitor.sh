@@ -69,16 +69,12 @@ start_monitoring() {
     print_status "Starting monitoring with ${interval}ms interval..."
     print_status "Logging to: $log_file"
     
-    # Start mactop in headless mode, appending to daily log file
+    # Start monitoring using the sampler script
     # Run in background and save PID
     (
         while true; do
-            local current_log=$(get_log_file)
-            # Get one sample and append to log file
-            mactop --headless --count 1 --interval "$interval" 2>/dev/null | \
-                jq -c '.[]' >> "$current_log"
-            
-            # Sleep for the interval (mactop --count 1 returns immediately after one sample)
+            current_log=$(get_log_file)
+            "$SCRIPT_DIR/sampler.sh" "$interval" "$current_log"
             sleep $(echo "scale=3; $interval/1000" | bc)
         done
     ) &
