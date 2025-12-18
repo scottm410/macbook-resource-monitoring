@@ -157,6 +157,8 @@ header h1 {
     padding: 20px;
     border: 1px solid var(--border-color);
     transition: transform 0.2s, box-shadow 0.2s;
+    min-height: 220px; /* Prevent layout shift on refresh */
+    contain: layout; /* CSS containment to prevent reflow propagation */
 }
 
 .metric-card:hover {

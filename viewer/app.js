@@ -7,6 +7,8 @@ class ResourceMonitor {
         this.maxDataPoints = 300; // Show last 5 minutes at 1-second intervals
         this.refreshInterval = null;
         this.logDir = '../logs';
+        this.lastDataLength = 0; // Track last known data length for incremental updates
+        this.isUpdating = false; // Prevent concurrent updates
         
         this.init();
     }
@@ -245,27 +247,42 @@ class ResourceMonitor {
     }
 
     async loadTodayLog() {
+        // Prevent concurrent updates that cause jitter
+        if (this.isUpdating) return;
+        this.isUpdating = true;
+        
         const today = new Date().toISOString().split('T')[0];
         const filename = `system-monitor-${today}.json`;
         
-        this.updateStatus('loading', `Loading ${filename}...`);
+        // Don't show loading status on refresh - it causes flicker
+        if (this.data.length === 0) {
+            this.updateStatus('loading', `Loading ${filename}...`);
+        }
         
         try {
             // Try to load from the logs directory
-            const response = await fetch(`${this.logDir}/${filename}`);
+            const response = await fetch(`${this.logDir}/${filename}`, {
+                cache: 'no-store' // Prevent caching
+            });
             if (!response.ok) {
                 throw new Error(`Log file not found: ${filename}`);
             }
             
             const text = await response.text();
-            this.parseLogData(text);
-            this.updateStatus('active', `Loaded ${this.data.length} samples`);
+            const newDataCount = this.parseLogData(text);
+            
+            // Only update status if we got new data or it's first load
+            if (newDataCount > 0 || this.data.length === 0) {
+                this.updateStatus('active', `${this.data.length} samples`);
+            }
         } catch (error) {
             console.error('Error loading log:', error);
-            this.updateStatus('error', 'No log file found. Start monitoring first.');
-            
-            // Show instructions
-            this.showInstructions();
+            if (this.data.length === 0) {
+                this.updateStatus('error', 'No log file found. Start monitoring first.');
+                this.showInstructions();
+            }
+        } finally {
+            this.isUpdating = false;
         }
     }
 
@@ -287,20 +304,37 @@ class ResourceMonitor {
     }
 
     parseLogData(text) {
-        this.data = [];
         const lines = text.trim().split('\n');
+        const previousLength = this.data.length;
         
-        for (const line of lines) {
+        // Only parse new lines if we already have data
+        const startIndex = previousLength > 0 ? previousLength : 0;
+        
+        // Clear and rebuild if file was truncated/rotated
+        if (lines.length < previousLength) {
+            this.data = [];
+        }
+        
+        // Parse only new lines
+        for (let i = this.data.length; i < lines.length; i++) {
+            const line = lines[i];
             if (!line.trim()) continue;
             try {
                 const entry = JSON.parse(line);
                 this.data.push(entry);
             } catch (e) {
-                console.warn('Failed to parse line:', line);
+                // Skip malformed lines silently
             }
         }
-
-        this.updateUI();
+        
+        const newDataCount = this.data.length - previousLength;
+        
+        // Only update UI if we have new data
+        if (newDataCount > 0 || previousLength === 0) {
+            this.updateUI();
+        }
+        
+        return newDataCount;
     }
 
     updateUI() {
