@@ -39,35 +39,35 @@
         </header>
 
         <div class="metrics-grid">
-            <!-- Windsurf Usage Panel - TOP -->
-            <div class="metric-card wide windsurf-card">
+            <!-- Row 1: Windsurf Chart (wide) + Windsurf Stats (right) -->
+            <div class="metric-card wide windsurf-chart-card">
                 <h3>🌊 Windsurf Usage</h3>
-                <div class="windsurf-header">
-                    <div class="windsurf-summary">
-                        <div class="windsurf-stat">
-                            <span class="label">Processes:</span>
-                            <span id="ws-process-count" class="value">--</span>
-                        </div>
-                        <div class="windsurf-stat">
-                            <span class="label">Total RAM:</span>
-                            <span id="ws-total-rss" class="value">-- GB</span>
-                        </div>
-                        <div class="windsurf-stat">
-                            <span class="label">Sampling Overhead:</span>
-                            <span id="sampling-overhead" class="value">-- ms</span>
-                        </div>
+                <canvas id="windsurf-chart"></canvas>
+            </div>
+
+            <div class="metric-card windsurf-stats-card">
+                <h3>🌊 Windsurf Stats</h3>
+                <div class="windsurf-stats-grid">
+                    <div class="ws-stat-item">
+                        <span class="label">Processes</span>
+                        <span id="ws-process-count" class="value">--</span>
                     </div>
-                    <div id="ws-warnings" class="warnings"></div>
-                </div>
-                <div class="windsurf-bars">
-                    <div class="bar-container">
-                        <span class="bar-label">CPU (normalized):</span>
+                    <div class="ws-stat-item">
+                        <span class="label">Total RAM</span>
+                        <span id="ws-total-rss" class="value">-- GB</span>
+                    </div>
+                    <div class="ws-stat-item">
+                        <span class="label">Overhead</span>
+                        <span id="sampling-overhead" class="value">-- ms</span>
+                    </div>
+                    <div class="ws-stat-item full-width">
+                        <span class="bar-label">CPU (norm):</span>
                         <div class="bar-wrapper">
                             <div id="ws-cpu-bar" class="bar cpu-bar"></div>
                             <span id="ws-cpu-value" class="bar-value">--%</span>
                         </div>
                     </div>
-                    <div class="bar-container">
+                    <div class="ws-stat-item full-width">
                         <span class="bar-label">Memory:</span>
                         <div class="bar-wrapper">
                             <div id="ws-mem-bar" class="bar mem-bar"></div>
@@ -75,7 +75,15 @@
                         </div>
                     </div>
                 </div>
-                <canvas id="windsurf-chart"></canvas>
+                <div id="ws-warnings" class="warnings"></div>
+            </div>
+
+            <!-- Row 2: Memory, CPU, GPU -->
+            <div class="metric-card">
+                <h3>Memory</h3>
+                <div class="metric-value" id="memory-value">-- GB</div>
+                <div class="metric-detail" id="memory-detail">-- / -- GB</div>
+                <canvas id="memory-chart"></canvas>
             </div>
 
             <div class="metric-card">
@@ -92,13 +100,7 @@
                 <canvas id="gpu-chart"></canvas>
             </div>
 
-            <div class="metric-card">
-                <h3>Memory</h3>
-                <div class="metric-value" id="memory-value">-- GB</div>
-                <div class="metric-detail" id="memory-detail">-- / -- GB</div>
-                <canvas id="memory-chart"></canvas>
-            </div>
-
+            <!-- Row 3: Swap, Disk I/O, Network -->
             <div class="metric-card">
                 <h3>Swap</h3>
                 <div class="metric-value" id="swap-value">-- GB</div>

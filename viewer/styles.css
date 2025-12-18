@@ -369,7 +369,55 @@ header h1 {
     background: var(--accent-blue);
 }
 
-/* Windsurf Panel */
+/* Windsurf Chart Card (wide left) */
+.windsurf-chart-card {
+    border: 1px solid var(--accent-purple);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(167, 139, 250, 0.05) 100%);
+}
+
+.windsurf-chart-card canvas {
+    height: 200px !important;
+}
+
+/* Windsurf Stats Card (right side) */
+.windsurf-stats-card {
+    border: 1px solid var(--accent-purple);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(167, 139, 250, 0.05) 100%);
+}
+
+.windsurf-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.ws-stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ws-stat-item.full-width {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.ws-stat-item .label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.ws-stat-item .value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent-purple);
+}
+
+/* Legacy windsurf-card support */
 .windsurf-card {
     border: 1px solid var(--accent-purple);
     background: linear-gradient(135deg, var(--bg-card) 0%, rgba(167, 139, 250, 0.05) 100%);
