@@ -127,15 +127,27 @@ show_status() {
 }
 
 open_viewer() {
-    local viewer_path="$(dirname "$SCRIPT_DIR")/viewer/index.html"
+    local project_dir="$(dirname "$SCRIPT_DIR")"
+    local viewer_path="$project_dir/viewer/index.html"
+    local port="${VIEWER_PORT:-8765}"
     
     if [ ! -f "$viewer_path" ]; then
         print_error "Viewer not found at: $viewer_path"
         exit 1
     fi
     
-    print_status "Opening viewer..."
-    open "$viewer_path"
+    # Check if server is already running on the port
+    if lsof -i ":$port" > /dev/null 2>&1; then
+        print_status "Viewer server already running on port $port"
+    else
+        print_status "Starting viewer server on port $port..."
+        # Start Python HTTP server in background
+        (cd "$project_dir" && python3 -m http.server "$port" > /dev/null 2>&1) &
+        sleep 1
+    fi
+    
+    print_status "Opening viewer in browser..."
+    open "http://localhost:$port/viewer/index.html"
 }
 
 cleanup_logs() {
