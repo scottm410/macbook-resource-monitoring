@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacBook Resource Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🖥️ MacBook Resource Monitor</h1>
+            <div class="controls">
+                <div class="status-indicator">
+                    <span id="status-dot" class="status-dot"></span>
+                    <span id="status-text">Loading...</span>
+                </div>
+                <div class="file-selector">
+                    <label for="log-file">Log File:</label>
+                    <input type="file" id="log-file" accept=".json">
+                    <button id="load-today" class="btn">Load Today</button>
+                </div>
+                <div class="refresh-controls">
+                    <label>
+                        <input type="checkbox" id="auto-refresh" checked>
+                        Auto-refresh
+                    </label>
+                    <select id="refresh-interval">
+                        <option value="1000">1s</option>
+                        <option value="2000" selected>2s</option>
+                        <option value="5000">5s</option>
+                        <option value="10000">10s</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>CPU Usage</h3>
+                <div class="metric-value" id="cpu-value">--%</div>
+                <div class="metric-detail" id="cpu-power">-- W</div>
+                <canvas id="cpu-chart"></canvas>
+            </div>
+
+            <div class="metric-card">
+                <h3>GPU Usage</h3>
+                <div class="metric-value" id="gpu-value">--%</div>
+                <div class="metric-detail" id="gpu-power">-- W</div>
+                <canvas id="gpu-chart"></canvas>
+            </div>
+
+            <div class="metric-card">
+                <h3>Memory</h3>
+                <div class="metric-value" id="memory-value">-- GB</div>
+                <div class="metric-detail" id="memory-detail">-- / -- GB</div>
+                <canvas id="memory-chart"></canvas>
+            </div>
+
+            <div class="metric-card">
+                <h3>Swap</h3>
+                <div class="metric-value" id="swap-value">-- GB</div>
+                <div class="metric-detail" id="swap-detail">-- / -- GB</div>
+                <canvas id="swap-chart"></canvas>
+            </div>
+
+            <div class="metric-card">
+                <h3>Disk I/O</h3>
+                <div class="metric-value" id="disk-read">R: -- MB/s</div>
+                <div class="metric-detail" id="disk-write">W: -- MB/s</div>
+                <canvas id="disk-chart"></canvas>
+            </div>
+
+            <div class="metric-card">
+                <h3>Network</h3>
+                <div class="metric-value" id="net-down">↓ -- KB/s</div>
+                <div class="metric-detail" id="net-up">↑ -- KB/s</div>
+                <canvas id="network-chart"></canvas>
+            </div>
+
+            <div class="metric-card wide">
+                <h3>Temperature & Power</h3>
+                <div class="temp-grid">
+                    <div>
+                        <span class="label">CPU Temp:</span>
+                        <span id="cpu-temp" class="temp-value">--°C</span>
+                    </div>
+                    <div>
+                        <span class="label">GPU Temp:</span>
+                        <span id="gpu-temp" class="temp-value">--°C</span>
+                    </div>
+                    <div>
+                        <span class="label">System Power:</span>
+                        <span id="system-power" class="power-value">-- W</span>
+                    </div>
+                    <div>
+                        <span class="label">Thermal State:</span>
+                        <span id="thermal-state" class="thermal-value">--</span>
+                    </div>
+                </div>
+                <canvas id="temp-chart"></canvas>
+            </div>
+
+            <div class="metric-card wide">
+                <h3>System Power Over Time</h3>
+                <canvas id="power-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="process-section">
+            <h2>Top Processes</h2>
+            <div class="process-filters">
+                <label>
+                    <input type="checkbox" id="highlight-windsurf" checked>
+                    Highlight Windsurf/IDE processes
+                </label>
+            </div>
+            <table id="process-table">
+                <thead>
+                    <tr>
+                        <th>PID</th>
+                        <th>Name</th>
+                        <th>CPU %</th>
+                        <th>Memory</th>
+                    </tr>
+                </thead>
+                <tbody id="process-tbody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-section">
+            <h2>Session Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Samples</span>
+                    <span id="stat-samples" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Duration</span>
+                    <span id="stat-duration" class="stat-value">--</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Avg CPU</span>
+                    <span id="stat-avg-cpu" class="stat-value">--%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Peak CPU</span>
+                    <span id="stat-peak-cpu" class="stat-value">--%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Avg Memory</span>
+                    <span id="stat-avg-memory" class="stat-value">-- GB</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Peak Memory</span>
+                    <span id="stat-peak-memory" class="stat-value">-- GB</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Peak Swap</span>
+                    <span id="stat-peak-swap" class="stat-value">-- GB</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Avg Power</span>
+                    <span id="stat-avg-power" class="stat-value">-- W</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

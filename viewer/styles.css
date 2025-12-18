@@ -1,0 +1,368 @@
+/* MacBook Resource Monitor - Styles */
+
+:root {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-card: #0f3460;
+    --text-primary: #eaeaea;
+    --text-secondary: #a0a0a0;
+    --accent-blue: #4a9eff;
+    --accent-green: #4ade80;
+    --accent-yellow: #fbbf24;
+    --accent-red: #f87171;
+    --accent-purple: #a78bfa;
+    --border-color: #2a4a7a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-card);
+    border-radius: 20px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-yellow);
+    animation: pulse 2s infinite;
+}
+
+.status-dot.active {
+    background: var(--accent-green);
+}
+
+.status-dot.error {
+    background: var(--accent-red);
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.file-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-selector label {
+    color: var(--text-secondary);
+}
+
+.file-selector input[type="file"] {
+    display: none;
+}
+
+.btn {
+    padding: 8px 16px;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background: #3a8aef;
+    transform: translateY(-1px);
+}
+
+.refresh-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.refresh-controls label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.refresh-controls select {
+    padding: 6px 10px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.metric-card.wide {
+    grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+    .metric-card.wide {
+        grid-column: span 1;
+    }
+}
+
+.metric-card h3 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin-bottom: 5px;
+}
+
+.metric-detail {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+
+.metric-card canvas {
+    width: 100% !important;
+    height: 120px !important;
+}
+
+/* Temperature Grid */
+.temp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+    .temp-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.temp-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.temp-grid .label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.temp-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent-yellow);
+}
+
+.power-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent-green);
+}
+
+.thermal-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+}
+
+.thermal-value.warning {
+    color: var(--accent-yellow);
+}
+
+.thermal-value.critical {
+    color: var(--accent-red);
+}
+
+/* Process Section */
+.process-section {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px;
+}
+
+.process-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.process-filters {
+    margin-bottom: 15px;
+}
+
+.process-filters label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+#process-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#process-table th,
+#process-table td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#process-table th {
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#process-table tbody tr:hover {
+    background: rgba(74, 158, 255, 0.1);
+}
+
+#process-table tbody tr.highlighted {
+    background: rgba(167, 139, 250, 0.15);
+    border-left: 3px solid var(--accent-purple);
+}
+
+#process-table tbody tr.highlighted td:first-child {
+    padding-left: 12px;
+}
+
+/* Stats Section */
+.stats-section {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.stats-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
+}

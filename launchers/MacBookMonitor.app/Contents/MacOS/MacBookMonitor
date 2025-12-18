@@ -1,0 +1,51 @@
+#!/bin/bash
+# MacBook Resource Monitor - Automator App Launcher
+
+# Get the directory where the app bundle is located
+APP_DIR="$(dirname "$(dirname "$(dirname "$0")")")"
+PROJECT_DIR="$(dirname "$APP_DIR")"
+
+cd "$PROJECT_DIR/.."
+
+# Check if mactop is installed
+if ! command -v mactop &> /dev/null; then
+    osascript -e 'display dialog "mactop is not installed!\n\nInstall it with:\nbrew install mactop" buttons {"OK"} default button "OK" with icon stop with title "MacBook Monitor"'
+    exit 1
+fi
+
+# Check if already running
+if [ -f /tmp/macbook-monitor.pid ]; then
+    pid=$(cat /tmp/macbook-monitor.pid)
+    if ps -p "$pid" > /dev/null 2>&1; then
+        choice=$(osascript -e 'button returned of (display dialog "Monitor is already running.\n\nWhat would you like to do?" buttons {"Stop Monitoring", "Open Viewer", "Cancel"} default button "Open Viewer" with title "MacBook Monitor")')
+        
+        case "$choice" in
+            "Stop Monitoring")
+                ./src/monitor.sh stop
+                osascript -e 'display notification "Monitoring stopped" with title "MacBook Monitor"'
+                ;;
+            "Open Viewer")
+                ./src/monitor.sh viewer
+                ;;
+        esac
+        exit 0
+    fi
+fi
+
+# Start monitoring
+./src/monitor.sh start --interval 1000
+
+# Show notification
+osascript -e 'display notification "Monitoring started with 1-second interval" with title "MacBook Monitor"'
+
+# Ask what to do next
+choice=$(osascript -e 'button returned of (display dialog "Monitoring started!\n\nWhat would you like to do?" buttons {"Open Viewer", "Run in Background", "Stop"} default button "Open Viewer" with title "MacBook Monitor")')
+
+case "$choice" in
+    "Open Viewer")
+        ./src/monitor.sh viewer
+        ;;
+    "Stop")
+        ./src/monitor.sh stop
+        ;;
+esac
