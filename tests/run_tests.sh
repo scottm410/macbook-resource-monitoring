@@ -94,10 +94,19 @@ if [[ "$TEST_SUITE" == "all" || "$TEST_SUITE" == "unit" ]]; then
     run_test "StopMonitoring.command exists" "[ -f '$PROJECT_DIR/launchers/StopMonitoring.command' ]"
     run_test "OpenViewer.command exists" "[ -f '$PROJECT_DIR/launchers/OpenViewer.command' ]"
     
-    # Test: Automator app structure
+    # Test: Automator app bundle exists
     run_test "Automator app bundle exists" "[ -d '$PROJECT_DIR/launchers/MacBookMonitor.app' ]"
     run_test "Automator app Info.plist exists" "[ -f '$PROJECT_DIR/launchers/MacBookMonitor.app/Contents/Info.plist' ]"
     run_test "Automator app executable exists" "[ -f '$PROJECT_DIR/launchers/MacBookMonitor.app/Contents/MacOS/MacBookMonitor' ]"
+    
+    # Test: Menu bar app exists
+    run_test "Menu bar app bundle exists" "[ -d '$PROJECT_DIR/launchers/ResourceMonitor.app' ]"
+    run_test "Menu bar app Info.plist exists" "[ -f '$PROJECT_DIR/launchers/ResourceMonitor.app/Contents/Info.plist' ]"
+    run_test "Menu bar app executable exists" "[ -f '$PROJECT_DIR/launchers/ResourceMonitor.app/Contents/MacOS/ResourceMonitor' ]"
+    
+    # Test: Menu bar app source exists
+    run_test "Menu bar Swift source exists" "[ -f '$PROJECT_DIR/MenuBarApp/ResourceMonitor/main.swift' ]"
+    run_test "Menu bar build script exists" "[ -x '$PROJECT_DIR/MenuBarApp/build.sh' ]"
     
     # Test: Scripts are executable
     run_test "monitor.sh is executable" "[ -x '$PROJECT_DIR/src/monitor.sh' ]"
